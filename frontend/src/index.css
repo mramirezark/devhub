@@ -1,0 +1,147 @@
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-bg: #f5f6fb;
+  --color-bg-gradient-start: rgba(255, 255, 255, 0.95);
+  --color-bg-gradient-end: #f5f6fb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-text: #101828;
+  --color-text-muted: #475467;
+  --color-nav-bg: #f1f5f9;
+  --color-nav-muted: #475467;
+  --color-nav-active: #1d4ed8;
+  --color-nav-active-hover: #1e3a8a;
+  --color-accent: #1d4ed8;
+  --color-accent-hover: #1e3a8a;
+  --color-session-button: #0f172a;
+  --color-session-button-hover: #1d4ed8;
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-success-soft: #dcfce7;
+  --color-danger: #b91c1c;
+  --color-danger-bg: #fee2e2;
+  --color-info-bg: #eef2ff;
+  --color-info-text: #4338ca;
+  --color-table-header: #f8fafc;
+  --color-checkbox: #1d4ed8;
+  --color-input-bg: #fbfbfd;
+  --color-focus-ring: #94a3ff;
+  --color-text-strong: #1f2937;
+  --color-muted-alt: #94a3b8;
+  --color-chip-info-bg: #e0f2fe;
+  --color-chip-info-bg-hover: #bae6fd;
+  --color-chip-info-text: #0369a1;
+  --color-chip-danger-bg-hover: #fecaca;
+  --color-sidebar-bg: linear-gradient(180deg, #21243a 0%, #141827 100%);
+  --color-sidebar-border: rgba(255, 255, 255, 0.08);
+  --color-sidebar-active: #1d4ed8;
+  --color-sidebar-text: #e2e8f0;
+  --color-sidebar-muted: rgba(203, 213, 225, 0.7);
+  --color-card-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+  --color-modal-overlay: rgba(15, 23, 42, 0.45);
+  --metric-card-ink: rgba(255, 255, 255, 0.96);
+  --metric-blue-start: #2563eb;
+  --metric-blue-end: #3b82f6;
+  --metric-green-start: #16a34a;
+  --metric-green-end: #22c55e;
+  --metric-magenta-start: #d946ef;
+  --metric-magenta-end: #f43f5e;
+  --metric-slate-start: #334155;
+  --metric-slate-end: #1f2937;
+  --status-pending-bg: #fef3c7;
+  --status-pending-text: #b45309;
+  --status-in-progress-bg: #dbeafe;
+  --status-in-progress-text: #1d4ed8;
+  --status-completed-bg: #dcfce7;
+  --status-completed-text: #16a34a;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #0f172a;
+  --color-bg-gradient-start: rgba(15, 23, 42, 0.95);
+  --color-bg-gradient-end: #111827;
+  --color-surface: #1f2937;
+  --color-surface-alt: #111827;
+  --color-border: #273449;
+  --color-text: #f8fafc;
+  --color-text-muted: #cbd5f5;
+  --color-nav-bg: #1f2937;
+  --color-nav-muted: #cbd5f5;
+  --color-nav-active: #6366f1;
+  --color-nav-active-hover: #4f46e5;
+  --color-accent: #6366f1;
+  --color-accent-hover: #4f46e5;
+  --color-session-button: #6366f1;
+  --color-session-button-hover: #4f46e5;
+  --color-success: #34d399;
+  --color-success-hover: #059669;
+  --color-success-soft: rgba(52, 211, 153, 0.15);
+  --color-danger: #fca5a5;
+  --color-danger-bg: rgba(248, 113, 113, 0.18);
+  --color-info-bg: rgba(99, 102, 241, 0.15);
+  --color-info-text: #c7d2fe;
+  --color-table-header: rgba(15, 23, 42, 0.6);
+  --color-checkbox: #6366f1;
+  --color-input-bg: #0f172a;
+  --color-focus-ring: #4c51bf;
+  --color-text-strong: #f8fafc;
+  --color-muted-alt: rgba(148, 163, 184, 0.75);
+  --color-chip-info-bg: rgba(96, 165, 250, 0.2);
+  --color-chip-info-bg-hover: rgba(96, 165, 250, 0.3);
+  --color-chip-info-text: #bfdbfe;
+  --color-chip-danger-bg-hover: rgba(248, 113, 113, 0.4);
+  --color-sidebar-bg: linear-gradient(180deg, #0f172a 0%, #10121c 100%);
+  --color-sidebar-border: rgba(148, 163, 184, 0.12);
+  --color-sidebar-active: #6366f1;
+  --color-sidebar-text: #e2e8f0;
+  --color-sidebar-muted: rgba(148, 163, 184, 0.7);
+  --color-card-shadow: 0 14px 30px rgba(8, 15, 35, 0.55);
+  --color-modal-overlay: rgba(15, 23, 42, 0.65);
+  --metric-card-ink: rgba(255, 255, 255, 0.94);
+  --metric-blue-start: #4c51bf;
+  --metric-blue-end: #6366f1;
+  --metric-green-start: #10b981;
+  --metric-green-end: #22d3ee;
+  --metric-magenta-start: #c084fc;
+  --metric-magenta-end: #f472b6;
+  --metric-slate-start: #1e293b;
+  --metric-slate-end: #0f172a;
+  --status-pending-bg: rgba(253, 230, 138, 0.2);
+  --status-pending-text: #fcd34d;
+  --status-in-progress-bg: rgba(96, 165, 250, 0.2);
+  --status-in-progress-text: #bfdbfe;
+  --status-completed-bg: rgba(52, 211, 153, 0.2);
+  --status-completed-text: #6ee7b7;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}

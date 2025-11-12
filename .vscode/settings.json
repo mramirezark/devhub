@@ -1,0 +1,23 @@
+{
+  "rubyLsp.rubyCommand": "bundle",
+  "rubyLsp.rubyCommandArgs": [
+    "exec",
+    "ruby-lsp"
+  ],
+  "rubyLsp.bundleGemfile": "backend/Gemfile",
+  "rubyLsp.bundlePath": "vendor/bundle",
+  "rubyLsp.workspaceSymbol.searchPaths": [
+    "backend/app",
+    "backend/config",
+    "backend/lib"
+  ],
+  "rubyLsp.workspaceSymbol.ignoredPaths": [
+    "backend/vendor",
+    "backend/tmp",
+    "backend/log",
+    "frontend",
+    "node_modules",
+    "vendor/bundle"
+  ]
+}
+
