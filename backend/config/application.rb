@@ -44,6 +44,14 @@ module Backend
         config.autoload_paths << lib_path
         config.eager_load_paths << lib_path
       end
+
+      # Ignore config directories in engines (routes files are not constants)
+      # This must be done in an initializer after autoloaders are set up
+      initializer "ignore_engine_config_dirs", after: :setup_autoloaders do
+        Dir.glob(engines_root.join("*/config")).each do |config_dir|
+          Rails.autoloaders.main.ignore(config_dir)
+        end
+      end
     end
 
     # Configuration for the application, engines, and railties goes here.
