@@ -14,6 +14,11 @@ class Task < ApplicationRecord
   validates :status, presence: true
   validate :assignee_type_supported
 
+  # Query scopes
+  scope :completed, -> { where(status: :completed) }
+  scope :recent, -> { order(created_at: :desc) }
+  scope :assigned_to, ->(user) { where(assignee_type: "User", assignee_id: user.id) }
+
   after_commit :enqueue_status_tracking, on: %i[update]
 
   private

@@ -19,7 +19,7 @@ backend/log/*
 frontend/logs/*
 
 # Temporary files
-tmp/
+# Note: backend/tmp/ is handled below in Rails specific section
 *.tmp
 *.temp
 *.swp

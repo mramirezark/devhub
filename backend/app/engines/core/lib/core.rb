@@ -1,1 +1,1 @@
-require "core/engine"
+require_relative "core/engine"

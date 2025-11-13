@@ -1,1 +1,1 @@
-require "admin/engine"
+require_relative "admin/engine"

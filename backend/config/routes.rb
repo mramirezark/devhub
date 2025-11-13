@@ -12,6 +12,9 @@ Rails.application.routes.draw do
   resource :session, only: [ :create, :destroy ]
   get "/profile", to: "profiles#show"
 
+  # Mount Admin engine at /admin
+  mount Admin::Engine, at: "/admin"
+
   if Rails.env.development? || Rails.env.test?
     mount Sidekiq::Web => "/sidekiq"
   end
