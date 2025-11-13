@@ -1,0 +1,5 @@
+# Render ignore file - prevents Render from using Dockerfile
+# Render will use the Ruby buildpack instead
+Dockerfile
+.dockerignore
+

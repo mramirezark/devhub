@@ -99,6 +99,21 @@ The frontend will be available at `http://localhost:5173`.
 
 See the individual README files in `backend/README.md` and `frontend/README.md` for more detailed information about each part of the application.
 
+## Deployment
+
+### Render Deployment
+
+This application can be deployed to Render using the provided `render.yaml` configuration file.
+
+**Quick Start:**
+1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+2. In Render Dashboard, create a new Blueprint and connect your repository
+3. Render will automatically detect and use `render.yaml`
+4. Set the `RAILS_MASTER_KEY` environment variable in the Render dashboard
+5. Deploy!
+
+For detailed deployment instructions, see [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md).
+
 ## License
 
 [Add your license here]

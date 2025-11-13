@@ -56,6 +56,10 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
+  # Comprehensive code auditing tool that runs multiple analysis tools
+  # Runs Brakeman, Bundler Audit, RuboCop, Rails Best Practices, Flay, Flog, and License Finder
+  gem "rails_code_auditor", require: false
+
   # Language server support
   gem "ruby-lsp", require: false
 end
