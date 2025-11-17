@@ -11,30 +11,16 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2025_11_11_160638) do
-  create_schema "auth"
-  create_schema "extensions"
-  create_schema "graphql"
-  create_schema "graphql_public"
-  create_schema "pgbouncer"
-  create_schema "realtime"
-  create_schema "storage"
-  create_schema "vault"
-
   # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_graphql"
-  enable_extension "pg_stat_statements"
-  enable_extension "pgcrypto"
   enable_extension "plpgsql"
-  enable_extension "supabase_vault"
-  enable_extension "uuid-ossp"
 
   create_table "activities", force: :cascade do |t|
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.string "action", null: false
     t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
-    t.index ["created_at"], name: "index_activities_on_created_at"
-    t.index ["record_type", "record_id"], name: "index_activities_on_record_type_and_record_id"
+    t.index [ "created_at" ], name: "index_activities_on_created_at"
+    t.index [ "record_type", "record_id" ], name: "index_activities_on_record_type_and_record_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -42,7 +28,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_11_160638) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_projects_on_name", unique: true
+    t.index [ "name" ], name: "index_projects_on_name", unique: true
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -55,11 +41,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_11_160638) do
     t.bigint "assignee_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["assignee_type", "assignee_id"], name: "index_tasks_on_assignee"
-    t.index ["assignee_type", "assignee_id"], name: "index_tasks_on_assignee_type_and_assignee_id"
-    t.index ["due_at"], name: "index_tasks_on_due_at"
-    t.index ["project_id"], name: "index_tasks_on_project_id"
-    t.index ["status"], name: "index_tasks_on_status"
+    t.index [ "assignee_type", "assignee_id" ], name: "index_tasks_on_assignee"
+    t.index [ "assignee_type", "assignee_id" ], name: "index_tasks_on_assignee_type_and_assignee_id"
+    t.index [ "due_at" ], name: "index_tasks_on_due_at"
+    t.index [ "project_id" ], name: "index_tasks_on_project_id"
+    t.index [ "status" ], name: "index_tasks_on_status"
   end
 
   create_table "users", force: :cascade do |t|
@@ -81,10 +67,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_11_160638) do
     t.string "current_login_ip"
     t.string "last_login_ip"
     t.boolean "admin", default: false, null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["perishable_token"], name: "index_users_on_perishable_token", unique: true
-    t.index ["persistence_token"], name: "index_users_on_persistence_token", unique: true
-    t.index ["single_access_token"], name: "index_users_on_single_access_token", unique: true
+    t.index [ "email" ], name: "index_users_on_email", unique: true
+    t.index [ "perishable_token" ], name: "index_users_on_perishable_token", unique: true
+    t.index [ "persistence_token" ], name: "index_users_on_persistence_token", unique: true
+    t.index [ "single_access_token" ], name: "index_users_on_single_access_token", unique: true
   end
 
   add_foreign_key "tasks", "projects"

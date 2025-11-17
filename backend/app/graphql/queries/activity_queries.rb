@@ -24,7 +24,7 @@ module Queries
         end
       end
 
-      scope.order(created_at: :desc)
+      scope.recent
     end
   end
 end

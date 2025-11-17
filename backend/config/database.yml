@@ -92,6 +92,8 @@ production:
     username: devhub
     password: <%= ENV["DEVHUB_DATABASE_PASSWORD"] %>
     url: <%= ENV["DATABASE_URL"] %>
+    # Note: Supabase-specific extensions (pg_graphql, supabase_vault) are
+    # automatically enabled via config/initializers/supabase_extensions.rb
   cache:
     <<: *primary_production
     database: devhub_production_cache

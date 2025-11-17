@@ -26,8 +26,14 @@ module Queries
         scope = scope.where(project_id: normalized_project_id) if normalized_project_id
       end
 
-      scope = scope.public_send(status) if status.present?
-      scope
+      # Use explicit completed scope when filtering by completed status
+      if status == "completed"
+        scope = scope.completed
+      elsif status.present?
+        scope = scope.public_send(status)
+      end
+
+      scope.recent
     end
 
     def task(id:)

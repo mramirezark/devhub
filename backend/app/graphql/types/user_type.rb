@@ -14,7 +14,7 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def assigned_tasks
-      object.assigned_tasks.includes(:project, :activities)
+      Task.assigned_to(object).includes(:project, :activities).recent
     end
   end
 end

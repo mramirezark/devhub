@@ -22,7 +22,7 @@ class User < ApplicationRecord
   end
 
   def should_validate_password_confirmation?
-    password.present?
+    password_confirmation.present? && password.present?
   end
 
   def password_matches_confirmation

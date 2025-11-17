@@ -1,0 +1,31 @@
+#!/bin/bash
+# Quick script to switch between development and test modes
+# Usage: ./bin/dev-test [dev|test|check]
+
+case "$1" in
+  dev|development)
+    export RAILS_ENV=development
+    echo "Switched to DEVELOPMENT mode"
+    echo "Current environment: $(bin/rails runner 'puts Rails.env' 2>/dev/null || echo 'development')"
+    ;;
+  test)
+    export RAILS_ENV=test
+    echo "Switched to TEST mode"
+    echo "Current environment: $(RAILS_ENV=test bin/rails runner 'puts Rails.env' 2>/dev/null || echo 'test')"
+    ;;
+  check|status)
+    echo "Current RAILS_ENV: ${RAILS_ENV:-development (default)}"
+    if command -v rails &> /dev/null; then
+      echo "Rails environment: $(bin/rails runner 'puts Rails.env' 2>/dev/null || echo 'unknown')"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 [dev|test|check]"
+    echo ""
+    echo "Commands:"
+    echo "  dev     - Switch to development mode"
+    echo "  test    - Switch to test mode"
+    echo "  check   - Check current environment"
+    exit 1
+    ;;
+esac
