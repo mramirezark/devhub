@@ -14,20 +14,31 @@ class SessionsController < ApplicationController
     )
 
     if result.user
-      # Verify the session cookie was set
-      session_cookie = cookies["_devhub_session"]
       Rails.logger.info "[Authlogic] Login successful for user: #{result.user.id}"
-      Rails.logger.info "[Authlogic] Session cookie set: #{session_cookie.present?}"
-      Rails.logger.info "[Authlogic] Session cookie length: #{session_cookie&.length || 0}"
+      Rails.logger.info "[Authlogic] UserSession persisted: #{result.user_session.persisted?}"
 
-      # Verify we can read it back immediately
-      if session_cookie.present?
-        test_session = UserSession.find
-        if test_session
-          Rails.logger.info "[Authlogic] Session verified - can be read back immediately"
-        else
-          Rails.logger.error "[Authlogic] WARNING: Session cookie set but cannot be read back!"
-        end
+      # Authlogic's automatic cookie setting doesn't work properly with ActionController::API
+      # We need to manually set the cookie with the correct attributes
+      # Authlogic identifies sessions using the user's persistence_token
+      user = result.user_session.record
+
+      if user && user.respond_to?(:persistence_token)
+        persistence_token = user.persistence_token
+        same_site = Rails.env.production? ? :none : :lax
+
+        # Set the cookie with all required attributes for cross-origin support
+        cookies["_devhub_session"] = {
+          value: persistence_token,
+          httponly: true,
+          secure: Rails.env.production?,
+          same_site: same_site,
+          expires: result.user_session.remember_me? ? 2.weeks.from_now : nil
+        }
+
+        Rails.logger.info "[Authlogic] Cookie set with persistence_token"
+        Rails.logger.info "[Authlogic] Cookie attributes: httponly=true, secure=#{Rails.env.production?}, same_site=#{same_site}"
+      else
+        Rails.logger.error "[Authlogic] Cannot set cookie - user or persistence_token missing"
       end
 
       render json: { user: user_payload(result.user) }, status: :created
