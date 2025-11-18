@@ -6,6 +6,13 @@ class ApplicationController < ActionController::API
   # By defining it as a public method, Authlogic can access it
   public :cookies
 
+  # Stub method for Authlogic's last_request_at tracking
+  # Authlogic calls this to determine if it should update last_request_at
+  # We return false to disable this feature in API controllers
+  def last_request_update_allowed?
+    false
+  end
+
   private
 
   def current_user_session
