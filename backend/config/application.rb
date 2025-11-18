@@ -77,7 +77,14 @@ module Backend
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.session_store :cookie_store, key: "_devhub_session", same_site: :lax
+    # Session store configuration
+    # In production with SSL, use :none for same_site to allow cross-origin requests
+    # In development, use :lax for better security
+    same_site_setting = Rails.env.production? ? :none : :lax
+    config.session_store :cookie_store,
+                         key: "_devhub_session",
+                         same_site: same_site_setting,
+                         secure: Rails.env.production?
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
 

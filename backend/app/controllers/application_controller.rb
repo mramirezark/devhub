@@ -13,7 +13,16 @@ class ApplicationController < ActionController::API
     # Authlogic needs the controller to access cookies and session data
     UserSession.controller = self unless UserSession.controller == self
     @current_user_session ||= begin
-      UserSession.find
+      session = UserSession.find
+      # Log in production for debugging
+      if Rails.env.production?
+        if session
+          Rails.logger.info "UserSession found for user: #{session.user&.id}"
+        else
+          Rails.logger.warn "UserSession.find returned nil. Cookies present: #{cookies.any?}, Cookie keys: #{cookies.keys.inspect}"
+        end
+      end
+      session
     rescue StandardError => e
       # Log error in production for debugging
       Rails.logger.error "UserSession.find failed: #{e.message}" if Rails.env.production?
