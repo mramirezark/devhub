@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 module Mutations
   class UpdateUser < BaseMutation
-    description "Update a user's profile or admin status"
+    include GraphqlConcerns::AdminAuthorization
+
+    description "Update a user's profile or admin status (admin only)"
 
     argument :id, ::GraphQL::Types::ID, required: true
     argument :name, String, required: false
@@ -10,17 +14,20 @@ module Mutations
     field :user, Types::UserType, null: true
     field :errors, [ String ], null: false
 
-    def resolve(id:, **attributes)
-      user = locate_record(User, id)
-      return { user: nil, errors: [ "User not found" ] } unless user
+    def resolve(id:, name: nil, email: nil, admin: nil)
+      require_admin!
 
-      if attributes.empty?
-        { user: user, errors: [] }
-      elsif user.update(attributes)
-        { user: user, errors: [] }
-      else
-        { user: nil, errors: user.errors.full_messages }
-      end
+      result = Admin::Services::UserService.update(
+        id: id,
+        name: name,
+        email: email,
+        admin: admin
+      )
+
+      {
+        user: result[:user],
+        errors: result[:errors]
+      }
     end
   end
 end

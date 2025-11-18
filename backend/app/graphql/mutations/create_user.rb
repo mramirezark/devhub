@@ -2,7 +2,9 @@
 
 module Mutations
   class CreateUser < BaseMutation
-    description "Create a new user who can be assigned to tasks"
+    include GraphqlConcerns::AdminAuthorization
+
+    description "Create a new user (admin only)"
 
     argument :name, String, required: true
     argument :email, String, required: true
@@ -14,19 +16,20 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(name:, email:, password:, password_confirmation: nil, admin: false)
-      user = User.new(
-        name:,
-        email:,
-        password:,
-        password_confirmation: password_confirmation.presence || password,
+      require_admin!
+
+      result = Admin::Services::UserService.create(
+        name: name,
+        email: email,
+        password: password,
+        password_confirmation: password_confirmation,
         admin: admin
       )
 
-      if user.save
-        { user: user, errors: [] }
-      else
-        { user: nil, errors: user.errors.full_messages }
-      end
+      {
+        user: result[:user],
+        errors: result[:errors]
+      }
     end
   end
 end

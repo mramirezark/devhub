@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mutations
   class UpdateProject < BaseMutation
     description "Update an existing project"
@@ -10,21 +12,12 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(id:, name: nil, description: nil)
-      project = locate_record(Project, id)
-      return { project: nil, errors: [ "Project not found" ] } unless project
+      result = Core::Services::ProjectService.update(id: id, name: name, description: description)
 
-      attributes = {
-        name: name,
-        description: description
-      }.compact
-
-      if attributes.empty?
-        { project: project, errors: [] }
-      elsif project.update(attributes)
-        { project: project, errors: [] }
-      else
-        { project: nil, errors: project.errors.full_messages }
-      end
+      {
+        project: result[:project],
+        errors: result[:errors]
+      }
     end
   end
 end

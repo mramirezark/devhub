@@ -14,23 +14,18 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(id:, title: nil, description: nil, status: nil, due_at: nil)
-      task = locate_record(Task, id)
-      return { task: nil, errors: [ "Task not found" ] } if task.nil?
-
-    result = TaskStatusUpdater.call(
-      task: task,
-      attributes: {
+      result = Core::Services::TaskService.update(
+        id: id,
         title: title,
         description: description,
         status: status,
         due_at: due_at
-      }
-    )
+      )
 
-    {
-      task: result.task,
-      errors: result.errors
-    }
+      {
+        task: result[:task],
+        errors: result[:errors]
+      }
     end
   end
 end

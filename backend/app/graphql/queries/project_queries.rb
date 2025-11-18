@@ -16,11 +16,11 @@ module Queries
     end
 
     def projects
-      Project.includes(:tasks)
+      Core::Services::ProjectService.list
     end
 
     def project(id:)
-      locate_record(Project, id)
+      Core::Services::ProjectService.find(id)
     end
   end
 end

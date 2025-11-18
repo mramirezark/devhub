@@ -19,25 +19,11 @@ module Queries
     end
 
     def tasks(project_id: nil, status: nil)
-      scope = Task.includes(:project, :activities)
-
-      if project_id.present?
-        normalized_project_id = extract_record_id(Project, project_id)
-        scope = scope.where(project_id: normalized_project_id) if normalized_project_id
-      end
-
-      # Use explicit completed scope when filtering by completed status
-      if status == "completed"
-        scope = scope.completed
-      elsif status.present?
-        scope = scope.public_send(status)
-      end
-
-      scope.recent
+      Core::Services::TaskService.list(project_id: project_id, status: status)
     end
 
     def task(id:)
-      locate_record(Task, id)
+      Core::Services::TaskService.find(id)
     end
   end
 end

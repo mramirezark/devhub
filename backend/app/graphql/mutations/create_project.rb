@@ -11,13 +11,12 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(name:, description: nil)
-      project = Project.new(name:, description:)
+      result = Core::Services::ProjectService.create(name: name, description: description)
 
-      if project.save
-        { project: project, errors: [] }
-      else
-        { project: nil, errors: project.errors.full_messages }
-      end
+      {
+        project: result[:project],
+        errors: result[:errors]
+      }
     end
   end
 end

@@ -96,7 +96,7 @@ export function UserForm({
             }
             disabled={loading}
           />
-          <span>Administrator access</span>
+          <span>Is Admin</span>
         </label>
 
         {mode === 'create' ? (

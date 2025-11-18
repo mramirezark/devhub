@@ -37,6 +37,8 @@ module Backend
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Concerns are automatically loaded from app/concerns/
+
     engines_root = config.root.join("app/engines")
     if engines_root.exist?
       Dir.glob(engines_root.join("*")).each do |engine_path|

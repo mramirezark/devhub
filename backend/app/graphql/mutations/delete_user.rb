@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 module Mutations
   class DeleteUser < BaseMutation
-    description "Delete a user account"
+    include GraphqlConcerns::AdminAuthorization
+
+    description "Delete a user account (admin only)"
 
     argument :id, ::GraphQL::Types::ID, required: true
 
@@ -8,14 +12,12 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(id:)
-      user = locate_record(User, id)
-      return { success: false, errors: [ "User not found" ] } unless user
+      require_admin!
 
-      if user.destroy
-        { success: true, errors: [] }
-      else
-        { success: false, errors: user.errors.full_messages }
-      end
+      Admin::Services::UserService.delete(
+        id: id,
+        current_user_id: context[:current_user]&.id
+      )
     end
   end
 end

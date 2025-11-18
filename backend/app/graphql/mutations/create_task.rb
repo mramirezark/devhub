@@ -14,21 +14,18 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(project_id:, title:, description: nil, status: nil, due_at: nil)
-      project = locate_record(Project, project_id)
-      return { task: nil, errors: [ "Project not found" ] } if project.nil?
-
-      task = project.tasks.new(
-        title:,
-        description:,
-        status: status || "pending",
+      result = Core::Services::TaskService.create(
+        project_id: project_id,
+        title: title,
+        description: description,
+        status: status,
         due_at: due_at
       )
 
-      if task.save
-        { task: task, errors: [] }
-      else
-        { task: nil, errors: task.errors.full_messages }
-      end
+      {
+        task: result[:task],
+        errors: result[:errors]
+      }
     end
   end
 end

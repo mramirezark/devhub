@@ -1,7 +1,7 @@
 Admin::Engine.routes.draw do
   # Admin engine routes
   # All routes here will be namespaced under /admin
-  # Example:
-  # resources :dashboard, only: [:index]
-  # This will be available at /admin/dashboard
+
+  # Note: Admin GraphQL queries/mutations are available through the main /graphql endpoint
+  # No separate admin GraphQL endpoint needed
 end

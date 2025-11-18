@@ -18,9 +18,12 @@ module Types
       ids.map { |id| context.schema.object_from_id(id, context) }
     end
 
-    include Queries::UserQueries
+    # Core queries (tasks, projects, activities)
     include Queries::ProjectQueries
     include Queries::TaskQueries
     include Queries::ActivityQueries
+
+    # Admin queries (require admin privileges)
+    include Queries::UserQueries
   end
 end

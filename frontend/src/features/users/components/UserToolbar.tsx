@@ -14,7 +14,7 @@ export function UserToolbar({ onCreate, totalUsers }: UserToolbarProps) {
         </p>
       </div>
       <button type="button" className="users__create-button" onClick={onCreate}>
-        Invite user
+        New User
       </button>
     </header>
   )

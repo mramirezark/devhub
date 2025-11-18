@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mutations
   class DeleteProject < BaseMutation
     description "Delete a project and its associated tasks"
@@ -8,13 +10,7 @@ module Mutations
     field :errors, [ String ], null: false
 
     def resolve(id:)
-      project = locate_record(Project, id)
-      return { success: false, errors: [ "Project not found" ] } unless project
-
-      project.destroy!
-      { success: true, errors: [] }
-    rescue StandardError => error
-      { success: false, errors: [ error.message ] }
+      Core::Services::ProjectService.delete(id: id)
     end
   end
 end
