@@ -6,11 +6,16 @@ class ApplicationController < ActionController::API
   # By defining it as a public method, Authlogic can access it
   public :cookies
 
-  # Stub method for Authlogic's last_request_at tracking
-  # Authlogic calls this to determine if it should update last_request_at
-  # We return false to disable this feature in API controllers
+  # Stub methods for Authlogic features not available in API controllers
+  # Authlogic calls these to determine if it should update session tracking
+  # We return false/true as appropriate to disable these features in API controllers
   def last_request_update_allowed?
     false
+  end
+
+  def renew_session_id
+    # Allow session ID renewal (default behavior)
+    true
   end
 
   private
@@ -21,20 +26,9 @@ class ApplicationController < ActionController::API
     UserSession.controller = self unless UserSession.controller == self
     @current_user_session ||= begin
       session = UserSession.find
-      # Log in production for debugging
-      if Rails.env.production?
-        if session
-          Rails.logger.info "UserSession found for user: #{session.user&.id}"
-        else
-          # Check if session cookie exists
-          session_cookie = cookies["_devhub_session"]
-          Rails.logger.warn "UserSession.find returned nil. Session cookie present: #{session_cookie.present?}"
-        end
-      end
       session
     rescue StandardError => e
-      # Log error in production for debugging
-      Rails.logger.error "UserSession.find failed: #{e.message}" if Rails.env.production?
+      Rails.logger.error "UserSession.find failed: #{e.message}"
       nil
     end
   end

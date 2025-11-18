@@ -14,11 +14,6 @@ class SessionsController < ApplicationController
     )
 
     if result.user
-      # Log cookie information in production for debugging
-      if Rails.env.production?
-        session_cookie = cookies["_devhub_session"]
-        Rails.logger.info "Session created. Cookie set: #{session_cookie.present?}, User: #{result.user.id}"
-      end
       render json: { user: user_payload(result.user) }, status: :created
     else
       render json: { errors: result.errors }, status: :unauthorized

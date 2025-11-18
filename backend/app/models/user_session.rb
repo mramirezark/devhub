@@ -5,10 +5,8 @@ class UserSession < Authlogic::Session::Base
   # Use the same key as Rails session store for consistency
   session_key "_devhub_session"
 
-  # In production, ensure cookies work with cross-origin requests
-  if Rails.env.production?
-    # Use secure cookies in production (required for same_site: :none)
-    secure true
-    httponly true
-  end
+  # Cookie security settings (must match Rails session store configuration)
+  # secure and httponly are set based on environment in config/application.rb
+  secure Rails.env.production?
+  httponly true
 end
