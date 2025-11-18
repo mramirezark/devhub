@@ -1,6 +1,11 @@
 class ApplicationController < ActionController::API
   include ActionController::Cookies
 
+  # Make cookies accessible to Authlogic
+  # Authlogic needs to access cookies, but in API controllers it's private by default
+  # By defining it as a public method, Authlogic can access it
+  public :cookies
+
   private
 
   def current_user_session
