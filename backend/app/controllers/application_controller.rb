@@ -19,7 +19,9 @@ class ApplicationController < ActionController::API
         if session
           Rails.logger.info "UserSession found for user: #{session.user&.id}"
         else
-          Rails.logger.warn "UserSession.find returned nil. Cookies present: #{cookies.any?}, Cookie keys: #{cookies.keys.inspect}"
+          # Check if session cookie exists
+          session_cookie = cookies["_devhub_session"]
+          Rails.logger.warn "UserSession.find returned nil. Session cookie present: #{session_cookie.present?}"
         end
       end
       session
