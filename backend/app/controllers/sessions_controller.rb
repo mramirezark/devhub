@@ -27,16 +27,45 @@ class SessionsController < ApplicationController
         same_site = Rails.env.production? ? :none : :lax
 
         # Set the cookie with all required attributes for cross-origin support
-        cookies["_devhub_session"] = {
+        cookie_options = {
           value: persistence_token,
           httponly: true,
           secure: Rails.env.production?,
-          same_site: same_site,
-          expires: result.user_session.remember_me? ? 2.weeks.from_now : nil
+          same_site: same_site
         }
+
+        # Add expires if remember_me is set
+        if result.user_session.remember_me?
+          cookie_options[:expires] = 2.weeks.from_now
+        end
+
+        cookies["_devhub_session"] = cookie_options
 
         Rails.logger.info "[Authlogic] Cookie set with persistence_token"
         Rails.logger.info "[Authlogic] Cookie attributes: httponly=true, secure=#{Rails.env.production?}, same_site=#{same_site}"
+
+        # Verify the cookie was actually set in the response
+        # Note: response.headers["Set-Cookie"] might be an array
+        set_cookie_headers = Array(response.headers["Set-Cookie"])
+        devhub_cookie = set_cookie_headers.find { |h| h.include?("_devhub_session") }
+
+        if devhub_cookie
+          Rails.logger.info "[Authlogic] Set-Cookie header found: #{devhub_cookie[0..300]}"
+          # Check if same_site is in the header
+          if devhub_cookie.include?("SameSite=None")
+            Rails.logger.info "[Authlogic] ✓ SameSite=None is in Set-Cookie header"
+          else
+            Rails.logger.warn "[Authlogic] ⚠ SameSite=None NOT found in Set-Cookie header"
+          end
+          if devhub_cookie.include?("Secure")
+            Rails.logger.info "[Authlogic] ✓ Secure is in Set-Cookie header"
+          else
+            Rails.logger.warn "[Authlogic] ⚠ Secure NOT found in Set-Cookie header"
+          end
+        else
+          Rails.logger.error "[Authlogic] ✗ Set-Cookie header for _devhub_session NOT found in response"
+          Rails.logger.error "[Authlogic] Available Set-Cookie headers: #{set_cookie_headers.inspect}"
+        end
       else
         Rails.logger.error "[Authlogic] Cannot set cookie - user or persistence_token missing"
       end
