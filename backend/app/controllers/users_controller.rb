@@ -1,12 +1,15 @@
-class UsersController < ApplicationController
-  def create
-    user = User.new(user_params)
+# frozen_string_literal: true
 
-    if user.save
-      UserSession.create(user)
-      render json: { user: user_payload(user) }, status: :created
+class UsersController < ApplicationController
+  include UserSerializer
+
+  def create
+    result = UserRegistrationService.call(attributes: user_params)
+
+    if result.user
+      render json: { user: user_payload(result.user) }, status: :created
     else
-      render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: result.errors }, status: :unprocessable_entity
     end
   end
 
@@ -14,13 +17,5 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation)
-  end
-
-  def user_payload(user)
-    {
-      id: user.id,
-      name: user.name,
-      email: user.email
-    }
   end
 end

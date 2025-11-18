@@ -1,17 +1,26 @@
-class SessionsController < ApplicationController
-  def create
-    user_session = UserSession.new(session_params.to_h)
+# frozen_string_literal: true
 
-    if user_session.save
-      render json: { user: user_payload(user_session.user) }, status: :created
+class SessionsController < ApplicationController
+  include UserSerializer
+
+  def create
+    result = AuthenticationService.login(
+      email: session_params[:email],
+      password: session_params[:password],
+      remember_me: session_params[:remember_me]
+    )
+
+    if result.user
+      render json: { user: user_payload(result.user) }, status: :created
     else
-      render json: { errors: user_session.errors.full_messages }, status: :unauthorized
+      render json: { errors: result.errors }, status: :unauthorized
     end
   end
 
   def destroy
-    if current_user_session
-      current_user_session.destroy
+    result = AuthenticationService.logout(user_session: current_user_session)
+
+    if result.errors.empty?
       head :no_content
     else
       head :unauthorized
@@ -24,13 +33,5 @@ class SessionsController < ApplicationController
     permitted = params.require(:session).permit(:email, :password, :remember_me)
     permitted[:remember_me] = ActiveModel::Type::Boolean.new.cast(permitted[:remember_me])
     permitted
-  end
-
-  def user_payload(user)
-    {
-      id: user.id,
-      name: user.name,
-      email: user.email
-    }
   end
 end
