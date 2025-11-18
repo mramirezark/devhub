@@ -35,6 +35,16 @@ class ApplicationController < ActionController::API
     nil
   end
 
+  # Cookie secure flag - must match Rails session store
+  def cookie_secure
+    Rails.env.production?
+  end
+
+  # Cookie http_only flag - must match Rails session store
+  def cookie_http_only
+    true
+  end
+
   # Session access - provide access to the session object
   # ActionController::API doesn't include session by default, so we provide it
   def session
@@ -52,11 +62,35 @@ class ApplicationController < ActionController::API
     # Activate Authlogic for this controller before finding session
     # Authlogic needs the controller to access cookies and session data
     UserSession.controller = self unless UserSession.controller == self
+
     @current_user_session ||= begin
+      # Check all cookies to see what's available
+      all_cookies = cookies.to_h.keys
+      session_cookie = cookies["_devhub_session"]
+
+      Rails.logger.info "[Authlogic] Looking for session. Available cookies: #{all_cookies.inspect}"
+      Rails.logger.info "[Authlogic] Session cookie present: #{session_cookie.present?}"
+      Rails.logger.info "[Authlogic] Session cookie value length: #{session_cookie&.length || 0}"
+
+      if session_cookie.present?
+        Rails.logger.info "[Authlogic] Session cookie preview: #{session_cookie[0..50]}..."
+      end
+
       session = UserSession.find
+
+      if session
+        Rails.logger.info "[Authlogic] Session found for user: #{session.user&.id}"
+      elsif session_cookie.present?
+        Rails.logger.error "[Authlogic] Session cookie exists but UserSession.find returned nil"
+        Rails.logger.error "[Authlogic] This suggests Authlogic cannot read the cookie. Check cookie attributes."
+      else
+        Rails.logger.warn "[Authlogic] No session cookie found"
+      end
+
       session
     rescue StandardError => e
-      Rails.logger.error "UserSession.find failed: #{e.message}"
+      Rails.logger.error "[Authlogic] UserSession.find failed: #{e.class}: #{e.message}"
+      Rails.logger.error "[Authlogic] Backtrace: #{e.backtrace.first(5).join("\n")}"
       nil
     end
   end

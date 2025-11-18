@@ -14,8 +14,25 @@ class SessionsController < ApplicationController
     )
 
     if result.user
+      # Verify the session cookie was set
+      session_cookie = cookies["_devhub_session"]
+      Rails.logger.info "[Authlogic] Login successful for user: #{result.user.id}"
+      Rails.logger.info "[Authlogic] Session cookie set: #{session_cookie.present?}"
+      Rails.logger.info "[Authlogic] Session cookie length: #{session_cookie&.length || 0}"
+
+      # Verify we can read it back immediately
+      if session_cookie.present?
+        test_session = UserSession.find
+        if test_session
+          Rails.logger.info "[Authlogic] Session verified - can be read back immediately"
+        else
+          Rails.logger.error "[Authlogic] WARNING: Session cookie set but cannot be read back!"
+        end
+      end
+
       render json: { user: user_payload(result.user) }, status: :created
     else
+      Rails.logger.warn "[Authlogic] Login failed: #{result.errors.join(', ')}"
       render json: { errors: result.errors }, status: :unauthorized
     end
   end
