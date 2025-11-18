@@ -39,18 +39,40 @@ class SessionsController < ApplicationController
           cookie_options[:expires] = 2.weeks.from_now
         end
 
+        # Set the cookie via Rails cookie helper
         cookies["_devhub_session"] = cookie_options
 
         Rails.logger.info "[Authlogic] Cookie set with persistence_token"
         Rails.logger.info "[Authlogic] Cookie attributes: httponly=true, secure=#{Rails.env.production?}, same_site=#{same_site}"
 
+        # Check if cookie is in the cookie jar
+        cookie_jar_value = cookies["_devhub_session"]
+        Rails.logger.info "[Authlogic] Cookie in jar: #{cookie_jar_value.present?}, value length: #{cookie_jar_value&.length || 0}"
+
+        # Try a different approach - set cookie directly via response
+        # Sometimes ActionController::API needs explicit cookie setting
+        # response.set_cookie uses Rack::Utils.set_cookie_header format
+        response.set_cookie(
+          "_devhub_session",
+          {
+            value: persistence_token,
+            httponly: true,
+            secure: Rails.env.production?,
+            same_site: same_site,  # :none or :lax symbol
+            expires: result.user_session.remember_me? ? 2.weeks.from_now : nil,
+            path: "/"
+          }
+        )
+
+        Rails.logger.info "[Authlogic] Cookie also set via response.set_cookie"
+
         # Verify the cookie was actually set in the response
-        # Note: response.headers["Set-Cookie"] might be an array
+        # Check after setting via response.set_cookie
         set_cookie_headers = Array(response.headers["Set-Cookie"])
         devhub_cookie = set_cookie_headers.find { |h| h.include?("_devhub_session") }
 
         if devhub_cookie
-          Rails.logger.info "[Authlogic] Set-Cookie header found: #{devhub_cookie[0..300]}"
+          Rails.logger.info "[Authlogic] ✓ Set-Cookie header found: #{devhub_cookie[0..300]}"
           # Check if same_site is in the header
           if devhub_cookie.include?("SameSite=None")
             Rails.logger.info "[Authlogic] ✓ SameSite=None is in Set-Cookie header"
