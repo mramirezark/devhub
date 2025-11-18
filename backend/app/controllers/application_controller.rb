@@ -4,7 +4,16 @@ class ApplicationController < ActionController::API
   private
 
   def current_user_session
-    @current_user_session ||= UserSession.find
+    # Activate Authlogic for this controller before finding session
+    # Authlogic needs the controller to access cookies and session data
+    UserSession.controller = self unless UserSession.controller == self
+    @current_user_session ||= begin
+      UserSession.find
+    rescue StandardError => e
+      # Log error in production for debugging
+      Rails.logger.error "UserSession.find failed: #{e.message}" if Rails.env.production?
+      nil
+    end
   end
 
   def current_user
