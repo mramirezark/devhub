@@ -20,6 +20,11 @@ class AuthenticationService
   end
 
   def login
+    # Ensure controller is set (should be set by SessionsController before calling)
+    unless UserSession.controller
+      raise "UserSession.controller must be set before calling AuthenticationService.login"
+    end
+
     user_session = UserSession.new(
       email: email,
       password: password,
