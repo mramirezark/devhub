@@ -26,45 +26,26 @@ class SessionsController < ApplicationController
         persistence_token = user.persistence_token
         same_site = Rails.env.production? ? :none : :lax
 
-        # Set the cookie with all required attributes for cross-origin support
-        cookie_options = {
+        # Set cookie directly via response.set_cookie
+        # This is the most reliable way with ActionController::API
+        # It directly sets the Set-Cookie header in the response
+        cookie_hash = {
           value: persistence_token,
           httponly: true,
           secure: Rails.env.production?,
+          path: "/",
           same_site: same_site
         }
 
         # Add expires if remember_me is set
         if result.user_session.remember_me?
-          cookie_options[:expires] = 2.weeks.from_now
+          cookie_hash[:expires] = 2.weeks.from_now
         end
 
-        # Set the cookie via Rails cookie helper
-        cookies["_devhub_session"] = cookie_options
+        response.set_cookie("_devhub_session", cookie_hash)
 
-        Rails.logger.info "[Authlogic] Cookie set with persistence_token"
+        Rails.logger.info "[Authlogic] Cookie set with persistence_token via response.set_cookie"
         Rails.logger.info "[Authlogic] Cookie attributes: httponly=true, secure=#{Rails.env.production?}, same_site=#{same_site}"
-
-        # Check if cookie is in the cookie jar
-        cookie_jar_value = cookies["_devhub_session"]
-        Rails.logger.info "[Authlogic] Cookie in jar: #{cookie_jar_value.present?}, value length: #{cookie_jar_value&.length || 0}"
-
-        # Try a different approach - set cookie directly via response
-        # Sometimes ActionController::API needs explicit cookie setting
-        # response.set_cookie uses Rack::Utils.set_cookie_header format
-        response.set_cookie(
-          "_devhub_session",
-          {
-            value: persistence_token,
-            httponly: true,
-            secure: Rails.env.production?,
-            same_site: same_site,  # :none or :lax symbol
-            expires: result.user_session.remember_me? ? 2.weeks.from_now : nil,
-            path: "/"
-          }
-        )
-
-        Rails.logger.info "[Authlogic] Cookie also set via response.set_cookie"
 
         # Verify the cookie was actually set in the response
         # Check after setting via response.set_cookie
@@ -73,13 +54,13 @@ class SessionsController < ApplicationController
 
         if devhub_cookie
           Rails.logger.info "[Authlogic] ✓ Set-Cookie header found: #{devhub_cookie[0..300]}"
-          # Check if same_site is in the header
-          if devhub_cookie.include?("SameSite=None")
+          # Check if same_site is in the header (case-insensitive)
+          if devhub_cookie.match?(/samesite[=:]none/i)
             Rails.logger.info "[Authlogic] ✓ SameSite=None is in Set-Cookie header"
           else
             Rails.logger.warn "[Authlogic] ⚠ SameSite=None NOT found in Set-Cookie header"
           end
-          if devhub_cookie.include?("Secure")
+          if devhub_cookie.match?(/secure/i)
             Rails.logger.info "[Authlogic] ✓ Secure is in Set-Cookie header"
           else
             Rails.logger.warn "[Authlogic] ⚠ Secure NOT found in Set-Cookie header"
@@ -92,7 +73,7 @@ class SessionsController < ApplicationController
         Rails.logger.error "[Authlogic] Cannot set cookie - user or persistence_token missing"
       end
 
-      render json: { user: user_payload(result.user) }, status: :created
+      render json: { user: user_payload(result.user, include_admin: true) }, status: :created
     else
       Rails.logger.warn "[Authlogic] Login failed: #{result.errors.join(', ')}"
       render json: { errors: result.errors }, status: :unauthorized
