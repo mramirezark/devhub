@@ -6,16 +6,44 @@ class ApplicationController < ActionController::API
   # By defining it as a public method, Authlogic can access it
   public :cookies
 
-  # Stub methods for Authlogic features not available in API controllers
-  # Authlogic calls these to determine if it should update session tracking
-  # We return false/true as appropriate to disable these features in API controllers
+  # ============================================================================
+  # Authlogic Controller Method Stubs
+  # ============================================================================
+  # ActionController::API doesn't include all methods that Authlogic expects.
+  # These explicit stubs provide the necessary methods with sensible defaults
+  # for API usage. If Authlogic calls a method not listed here, it will raise
+  # a proper NoMethodError so we can add it explicitly.
+  # ============================================================================
+
+  # Session ID renewal - allow by default (standard behavior)
+  def renew_session_id
+    true
+  end
+
+  # Last request tracking - disable for API controllers (not needed for stateless APIs)
   def last_request_update_allowed?
     false
   end
 
-  def renew_session_id
-    # Allow session ID renewal (default behavior)
-    true
+  # Cookie domain - return nil to use request's default domain
+  def cookie_domain
+    nil
+  end
+
+  # Cookie path - return nil to use default path (/)
+  def cookie_path
+    nil
+  end
+
+  # Session access - provide access to the session object
+  # ActionController::API doesn't include session by default, so we provide it
+  def session
+    request.session
+  end
+
+  # Handle unverified requests (CSRF) - raise exception for API
+  def handle_unverified_request
+    raise ActionController::InvalidAuthenticityToken
   end
 
   private
