@@ -27,7 +27,7 @@ export const TASK_DASHBOARD_QUERY = gql`
       id
       name
     }
-    users {
+    assignableUsers {
       id
       name
       email

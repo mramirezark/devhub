@@ -21,12 +21,16 @@ function App() {
 
   const isAuthenticated = auth.status === 'authenticated'
   const isAuthenticating = auth.status === 'authenticating' || auth.loading
+  const isAdmin = auth.currentUser?.admin === true
 
   useEffect(() => {
     if (!isAuthenticated) {
       setActiveTab('tasks')
+    } else if (activeTab === 'users' && !isAdmin) {
+      // If user is not admin and on users tab, switch to tasks
+      setActiveTab('tasks')
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, isAdmin, activeTab])
 
   const mainContent = useMemo(() => {
     if (activeTab === 'projects') {
@@ -48,7 +52,8 @@ function App() {
   }> = [
     { id: 'tasks', label: 'Tasks', icon: '📊' },
     { id: 'projects', label: 'Projects', icon: '🗂️' },
-    { id: 'users', label: 'Users', icon: '👥' },
+    // Only show users tab for admins
+    ...(isAdmin ? [{ id: 'users' as const, label: 'Users', icon: '👥' }] : []),
     { id: 'reports', label: 'Reports', icon: '📈', disabled: true },
     { id: 'billing', label: 'Billing', icon: '💳', disabled: true },
     { id: 'notifications', label: 'Notifications', icon: '🔔', disabled: true },

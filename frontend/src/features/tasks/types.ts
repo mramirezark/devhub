@@ -31,7 +31,7 @@ export interface Task {
 export interface TasksResponse {
   tasks: Task[]
   projects: Project[]
-  users: User[]
+  assignableUsers: User[]
 }
 
 export interface TaskFormInput {

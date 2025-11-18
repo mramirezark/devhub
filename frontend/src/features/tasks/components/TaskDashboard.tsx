@@ -55,7 +55,7 @@ export function TaskDashboard() {
   )
 
   const projects = (data?.projects ?? []) as Project[]
-  const users = (data?.users ?? []) as User[]
+  const users = (data?.assignableUsers ?? []) as User[]
   const tasks = data?.tasks ?? []
 
   const [createTaskMutation] = useMutation<CreateTaskResponse>(CREATE_TASK_MUTATION)

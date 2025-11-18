@@ -21,9 +21,12 @@ module Queries
           argument :offset, Integer, required: false, default_value: 0
         end
 
-      field :admin_stats, Types::AdminStatsType, null: false,
-        description: "Get admin dashboard statistics (admin only)"
-    end
+    field :admin_stats, Types::AdminStatsType, null: false,
+      description: "Get admin dashboard statistics (admin only)"
+
+    field :assignable_users, [ Types::UserType ], null: false,
+      description: "List all users available for task assignment (authenticated users)"
+  end
 
     def users
       require_admin!
@@ -43,6 +46,11 @@ module Queries
     def admin_stats
       require_admin!
       Admin::Services::AdminStatsService.stats
+    end
+
+    def assignable_users
+      # All authenticated users can see the list of users for assignment
+      User.all.order(:name)
     end
   end
 end
