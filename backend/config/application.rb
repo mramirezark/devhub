@@ -48,10 +48,18 @@ module Backend
       end
 
       # Ignore config directories in engines (routes files are not constants)
+      # Ignore app directories in engines (engines handle their own autoloading)
+      # Ignore spec directories in engines (test files should not be autoloaded)
       # This must be done in an initializer after autoloaders are set up
-      initializer "ignore_engine_config_dirs", after: :setup_autoloaders do
+      initializer "ignore_engine_dirs", after: :setup_autoloaders do
         Dir.glob(engines_root.join("*/config")).each do |config_dir|
           Rails.autoloaders.main.ignore(config_dir)
+        end
+        Dir.glob(engines_root.join("*/app")).each do |app_dir|
+          Rails.autoloaders.main.ignore(app_dir)
+        end
+        Dir.glob(engines_root.join("*/spec")).each do |spec_dir|
+          Rails.autoloaders.main.ignore(spec_dir)
         end
       end
     end
