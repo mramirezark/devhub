@@ -4,7 +4,7 @@ class UserSession < Authlogic::Session::Base
   # Use the same session key as Rails session store
   session_key "_devhub_session"
 
-  # Cookie settings - let Authlogic use controller methods for these
+  # Cookie settings - these will be used by Authlogic
   secure Rails.env.production?
   httponly true
 end
