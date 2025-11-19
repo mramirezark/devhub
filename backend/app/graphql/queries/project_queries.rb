@@ -6,7 +6,7 @@ module Queries
     include Queries::BaseQuery
 
     included do
-      field :projects, [ Types::ProjectType ], null: false,
+      field :projects, Types::ProjectType.connection_type, null: false,
         description: "List all projects"
 
       field :project, Types::ProjectType, null: true,
@@ -15,7 +15,7 @@ module Queries
         end
     end
 
-    def projects
+    def projects(**pagination_args)
       Core::Services::ProjectService.list
     end
 

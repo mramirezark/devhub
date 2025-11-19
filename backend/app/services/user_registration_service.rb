@@ -14,13 +14,15 @@ class UserRegistrationService
   end
 
   def call
-    user = User.new(permitted_attributes)
+    User.transaction do
+      user = User.new(permitted_attributes)
 
-    if user.save
-      user_session = UserSession.create(user)
-      Result.new(user: user, user_session: user_session, errors: [])
-    else
-      Result.new(user: nil, user_session: nil, errors: user.errors.full_messages)
+      if user.save
+        user_session = UserSession.create(user)
+        Result.new(user: user, user_session: user_session, errors: [])
+      else
+        Result.new(user: nil, user_session: nil, errors: user.errors.full_messages)
+      end
     end
   end
 

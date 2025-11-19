@@ -71,8 +71,13 @@ module Core
 
         task.destroy!
         { success: true, errors: [] }
-      rescue StandardError => error
+      rescue ActiveRecord::RecordNotDestroyed => error
         { success: false, errors: [ error.message ] }
+      rescue ActiveRecord::RecordInvalid => error
+        { success: false, errors: error.record.errors.full_messages }
+      rescue StandardError => error
+        Rails.logger.error "TaskService#delete failed: #{error.class}: #{error.message}"
+        { success: false, errors: [ "An error occurred while deleting the task" ] }
       end
 
       def self.assign_to_user(task_id:, user_id:)

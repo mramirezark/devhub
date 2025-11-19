@@ -38,6 +38,9 @@ class BackendSchema < GraphQL::Schema
   # Stop validating when it encounters this many errors:
   validate_max_errors(100)
 
+  # Default page size for connections (prevent excessive data transfer)
+  default_max_page_size(100)
+
   # Relay-style Object Identification:
 
   # Return a string UUID for `object`

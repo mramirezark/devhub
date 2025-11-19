@@ -41,6 +41,7 @@ export function TaskDashboard() {
     () => ({
       status: taskUi.status === 'ALL' ? undefined : taskUi.status,
       projectId: taskUi.projectId ?? undefined,
+      first: 100, // Request up to 100 items per page
     }),
     [taskUi.status, taskUi.projectId],
   )
@@ -54,9 +55,9 @@ export function TaskDashboard() {
     },
   )
 
-  const projects = (data?.projects ?? []) as Project[]
-  const users = (data?.assignableUsers ?? []) as User[]
-  const tasks = data?.tasks ?? []
+  const projects = useMemo(() => (data?.projects?.nodes ?? []) as Project[], [data?.projects])
+  const users = useMemo(() => (data?.assignableUsers?.nodes ?? []) as User[], [data?.assignableUsers])
+  const tasks = useMemo(() => data?.tasks?.nodes ?? [], [data?.tasks])
 
   const [createTaskMutation] = useMutation<CreateTaskResponse>(CREATE_TASK_MUTATION)
   const [updateTaskMutation] = useMutation<UpdateTaskResponse>(UPDATE_TASK_MUTATION)

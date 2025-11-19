@@ -5,8 +5,18 @@ export interface UserSummary {
   admin: boolean
 }
 
+export interface PageInfo {
+  hasNextPage: boolean
+  endCursor?: string | null
+}
+
+export interface Connection<T> {
+  nodes: T[]
+  pageInfo: PageInfo
+}
+
 export interface UsersQueryResponse {
-  users: UserSummary[]
+  users: Connection<UserSummary>
 }
 
 export interface UserFormInput {

@@ -1,36 +1,54 @@
 import { gql } from '@apollo/client'
 
 export const TASK_DASHBOARD_QUERY = gql`
-  query TaskDashboard($status: TaskStatusEnum, $projectId: ID) {
-    tasks(status: $status, projectId: $projectId) {
-      id
-      title
-      description
-      status
-      dueAt
-      assignee {
+  query TaskDashboard($status: TaskStatusEnum, $projectId: ID, $first: Int) {
+    tasks(status: $status, projectId: $projectId, first: $first) {
+      nodes {
+        id
+        title
+        description
+        status
+        dueAt
+        assignee {
+          id
+          name
+          email
+        }
+        project {
+          id
+          name
+        }
+        activities {
+          id
+          action
+          createdAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+    projects(first: $first) {
+      nodes {
+        id
+        name
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+    assignableUsers(first: $first) {
+      nodes {
         id
         name
         email
       }
-      project {
-        id
-        name
+      pageInfo {
+        hasNextPage
+        endCursor
       }
-      activities {
-        id
-        action
-        createdAt
-      }
-    }
-    projects {
-      id
-      name
-    }
-    assignableUsers {
-      id
-      name
-      email
     }
   }
 `

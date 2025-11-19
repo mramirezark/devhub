@@ -1,13 +1,19 @@
 import { gql } from '@apollo/client'
 
 export const PROJECTS_QUERY = gql`
-  query ProjectList {
-    projects {
-      id
-      name
-      description
-      tasks {
+  query ProjectList($first: Int) {
+    projects(first: $first) {
+      nodes {
         id
+        name
+        description
+        tasks {
+          id
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }

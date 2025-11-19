@@ -22,6 +22,7 @@ export function UsersPanel() {
 
   const { data, loading, error, refetch } = useQuery<UsersQueryResponse>(USERS_QUERY, {
     fetchPolicy: 'cache-and-network',
+    variables: { first: 100 }, // Request up to 100 items per page
   })
 
   const [createUserMutation] = useMutation<CreateUserResponse>(CREATE_USER_MUTATION)
@@ -45,7 +46,7 @@ useEffect(() => {
   }
 }, [deleteTarget])
 
-  const users = useMemo<UserSummary[]>(() => data?.users ?? [], [data?.users])
+  const users = useMemo<UserSummary[]>(() => data?.users?.nodes ?? [], [data?.users])
   const editingUser = useMemo(
     () => users.find((user) => user.id === uiState.editingUserId),
     [users, uiState.editingUserId],

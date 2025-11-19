@@ -28,10 +28,20 @@ export interface Task {
   activities: Activity[]
 }
 
+export interface PageInfo {
+  hasNextPage: boolean
+  endCursor?: string | null
+}
+
+export interface Connection<T> {
+  nodes: T[]
+  pageInfo: PageInfo
+}
+
 export interface TasksResponse {
-  tasks: Task[]
-  projects: Project[]
-  assignableUsers: User[]
+  tasks: Connection<Task>
+  projects: Connection<Project>
+  assignableUsers: Connection<User>
 }
 
 export interface TaskFormInput {

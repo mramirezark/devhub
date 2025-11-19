@@ -46,8 +46,13 @@ module Core
 
         project.destroy!
         { success: true, errors: [] }
-      rescue StandardError => error
+      rescue ActiveRecord::RecordNotDestroyed => error
         { success: false, errors: [ error.message ] }
+      rescue ActiveRecord::RecordInvalid => error
+        { success: false, errors: error.record.errors.full_messages }
+      rescue StandardError => error
+        Rails.logger.error "ProjectService#delete failed: #{error.class}: #{error.message}"
+        { success: false, errors: [ "An error occurred while deleting the project" ] }
       end
     end
   end

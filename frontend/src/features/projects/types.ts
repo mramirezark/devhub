@@ -5,13 +5,25 @@ export interface ProjectSummary {
   taskCount: number
 }
 
+export interface PageInfo {
+  hasNextPage: boolean
+  endCursor?: string | null
+}
+
+export interface Connection<T> {
+  nodes: T[]
+  pageInfo: PageInfo
+}
+
+export interface ProjectNode {
+  id: string
+  name: string
+  description?: string | null
+  tasks: Array<{ id: string }>
+}
+
 export interface ProjectsQueryResponse {
-  projects: Array<{
-    id: string
-    name: string
-    description?: string | null
-    tasks: Array<{ id: string }>
-  }>
+  projects: Connection<ProjectNode>
 }
 
 export interface ProjectInput {

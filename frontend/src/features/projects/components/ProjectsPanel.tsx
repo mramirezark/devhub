@@ -27,6 +27,7 @@ export function ProjectsPanel() {
 
   const { data, loading, error, refetch } = useQuery<ProjectsQueryResponse>(PROJECTS_QUERY, {
     fetchPolicy: 'cache-and-network',
+    variables: { first: 100 }, // Request up to 100 items per page
   })
 
   const [createProject] = useMutation<CreateProjectResponse>(CREATE_PROJECT_MUTATION)
@@ -45,8 +46,8 @@ export function ProjectsPanel() {
   }, [uiState.isFormOpen])
 
   const projects: ProjectSummary[] = useMemo(() => {
-    if (!data?.projects) return []
-    return data.projects.map((project) => ({
+    if (!data?.projects?.nodes) return []
+    return data.projects.nodes.map((project) => ({
       id: project.id,
       name: project.name,
       description: project.description,

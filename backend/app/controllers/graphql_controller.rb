@@ -17,8 +17,13 @@ class GraphqlController < ApplicationController
     result = BackendSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
   rescue StandardError => e
-    raise e unless Rails.env.development?
-    handle_error_in_development(e)
+    if Rails.env.development?
+      handle_error_in_development(e)
+    else
+      logger.error "GraphQL Error: #{e.class.name}: #{e.message}"
+      logger.error e.backtrace.join("\n")
+      render json: { errors: [ { message: "Internal server error" } ] }, status: :internal_server_error
+    end
   end
 
   private

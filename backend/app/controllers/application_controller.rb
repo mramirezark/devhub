@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::API
   include ActionController::Cookies
 
@@ -44,7 +46,11 @@ class ApplicationController < ActionController::API
 
     @current_user_session ||= begin
       session_cookie = cookies["_devhub_session"]
-      Rails.logger.info "[Authlogic] Looking for session. Cookie present: #{session_cookie.present?}"
+      all_cookies = cookies.to_h.keys
+
+      Rails.logger.info "[Authlogic] Looking for session. Available cookies: #{all_cookies.inspect}"
+      Rails.logger.info "[Authlogic] Session cookie present: #{session_cookie.present?}"
+      Rails.logger.info "[Authlogic] Session cookie value length: #{session_cookie&.length || 0}"
 
       session = UserSession.find
 
@@ -52,11 +58,15 @@ class ApplicationController < ActionController::API
         Rails.logger.info "[Authlogic] Session found for user: #{session.user&.id}"
       else
         Rails.logger.warn "[Authlogic] No session found. Cookie present: #{session_cookie.present?}"
+        if session_cookie.present?
+          Rails.logger.warn "[Authlogic] Cookie exists but UserSession.find returned nil - cookie may be invalid"
+        end
       end
 
       session
     rescue StandardError => e
       Rails.logger.error "[Authlogic] UserSession.find failed: #{e.class}: #{e.message}"
+      Rails.logger.error "[Authlogic] Backtrace: #{e.backtrace.first(5).join("\n")}"
       nil
     end
   end

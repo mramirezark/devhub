@@ -7,7 +7,7 @@ module Queries
     include GraphqlConcerns::AdminAuthorization
 
     included do
-      field :users, [ Types::UserType ], null: false,
+      field :users, Types::UserType.connection_type, null: false,
         description: "List all users in the system (admin only)"
 
       field :user, Types::UserType, null: true,
@@ -15,20 +15,17 @@ module Queries
           argument :id, ::GraphQL::Types::ID, required: true
         end
 
-      field :admin_users, [ Types::UserType ], null: false,
-        description: "List all users (admin only)" do
-          argument :limit, Integer, required: false, default_value: 50
-          argument :offset, Integer, required: false, default_value: 0
-        end
+      field :admin_users, Types::UserType.connection_type, null: false,
+        description: "List all users (admin only)"
 
-    field :admin_stats, Types::AdminStatsType, null: false,
-      description: "Get admin dashboard statistics (admin only)"
+      field :admin_stats, Types::AdminStatsType, null: false,
+        description: "Get admin dashboard statistics (admin only)"
 
-    field :assignable_users, [ Types::UserType ], null: false,
-      description: "List all users available for task assignment (authenticated users)"
-  end
+      field :assignable_users, Types::UserType.connection_type, null: false,
+        description: "List all users available for task assignment (authenticated users)"
+    end
 
-    def users
+    def users(**pagination_args)
       require_admin!
       Admin::Services::UserService.list
     end
@@ -38,9 +35,9 @@ module Queries
       Admin::Services::UserService.find(id)
     end
 
-    def admin_users(limit: 50, offset: 0)
+    def admin_users(**pagination_args)
       require_admin!
-      Admin::Services::UserService.list.limit(limit).offset(offset)
+      Admin::Services::UserService.list
     end
 
     def admin_stats
@@ -48,8 +45,9 @@ module Queries
       Admin::Services::AdminStatsService.stats
     end
 
-    def assignable_users
+    def assignable_users(**pagination_args)
       # All authenticated users can see the list of users for assignment
+      require_authenticated_user!
       User.all.order(:name)
     end
   end

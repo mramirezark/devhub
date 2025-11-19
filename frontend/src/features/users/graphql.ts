@@ -1,12 +1,18 @@
 import { gql } from '@apollo/client'
 
 export const USERS_QUERY = gql`
-  query UsersList {
-    users {
-      id
-      name
-      email
-      admin
+  query UsersList($first: Int) {
+    users(first: $first) {
+      nodes {
+        id
+        name
+        email
+        admin
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
     }
   }
 `

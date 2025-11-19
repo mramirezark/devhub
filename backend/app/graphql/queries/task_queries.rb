@@ -6,7 +6,7 @@ module Queries
     include Queries::BaseQuery
 
     included do
-      field :tasks, [ Types::TaskType ], null: false,
+      field :tasks, Types::TaskType.connection_type, null: false,
         description: "List tasks, optionally filtered by project or status" do
           argument :project_id, ::GraphQL::Types::ID, required: false
           argument :status, Types::TaskStatusEnum, required: false
@@ -18,8 +18,9 @@ module Queries
         end
     end
 
-    def tasks(project_id: nil, status: nil)
-      Core::Services::TaskService.list(project_id: project_id, status: status)
+    def tasks(project_id: nil, status: nil, **pagination_args)
+      scope = Core::Services::TaskService.list(project_id: project_id, status: status)
+      scope
     end
 
     def task(id:)
