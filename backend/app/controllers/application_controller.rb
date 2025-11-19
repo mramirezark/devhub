@@ -41,7 +41,24 @@ class ApplicationController < ActionController::API
 
   def current_user_session
     UserSession.controller = self unless UserSession.controller == self
-    @current_user_session ||= UserSession.find
+
+    @current_user_session ||= begin
+      session_cookie = cookies["_devhub_session"]
+      Rails.logger.info "[Authlogic] Looking for session. Cookie present: #{session_cookie.present?}"
+
+      session = UserSession.find
+
+      if session
+        Rails.logger.info "[Authlogic] Session found for user: #{session.user&.id}"
+      else
+        Rails.logger.warn "[Authlogic] No session found. Cookie present: #{session_cookie.present?}"
+      end
+
+      session
+    rescue StandardError => e
+      Rails.logger.error "[Authlogic] UserSession.find failed: #{e.class}: #{e.message}"
+      nil
+    end
   end
 
   def current_user
