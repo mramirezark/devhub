@@ -614,6 +614,10 @@
   color: var(--color-text-muted);
 }
 
+.dashboard-table th.dashboard-table__actions {
+  text-align: right;
+}
+
 .dashboard-table__muted {
   margin: 0.25rem 0 0;
   color: var(--color-text-muted);
@@ -625,10 +629,14 @@
   font-variant-numeric: tabular-nums;
 }
 
-.dashboard-table__actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
+.dashboard-table td.dashboard-table__actions {
+  text-align: right;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.dashboard-table__actions .dashboard-table__action + .dashboard-table__action {
+  margin-left: 0.5rem;
 }
 
 .dashboard-table__action {

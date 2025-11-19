@@ -8,9 +8,9 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
 
   setup :activate_authlogic
   test "GET /profile returns current user data when authenticated" do
-    user = create(:user, name: "Test User", email: "test@example.com", password: "password123", password_confirmation: "password123")
+    user = create(:user, name: "Test User", email: "test@example.com", password: "Password123", password_confirmation: "Password123")
     # Create session by logging in
-    post session_path, params: { session: { email: "test@example.com", password: "password123" } }, as: :json
+    post session_path, params: { session: { email: "test@example.com", password: "Password123" } }, as: :json
 
     get profile_path
 
@@ -23,9 +23,9 @@ class ProfilesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET /profile includes admin status when user is admin" do
-    admin_user = create(:user, :admin, name: "Admin User", email: "admin@example.com", password: "password123", password_confirmation: "password123")
+    admin_user = create(:user, :admin, name: "Admin User", email: "adminuser@example.com", password: "Password123", password_confirmation: "Password123")
     # Create session by logging in
-    post session_path, params: { session: { email: "admin@example.com", password: "password123" } }, as: :json
+    post session_path, params: { session: { email: "adminuser@example.com", password: "Password123" } }, as: :json
 
     get profile_path
 

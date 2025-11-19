@@ -8,8 +8,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       user: {
         name: "New User",
         email: "newuser@example.com",
-        password: "password123",
-        password_confirmation: "password123"
+        password: "Password123",
+        password_confirmation: "Password123"
       }
     }
 
@@ -54,8 +54,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       user: {
         name: "Another User",
         email: "existing@example.com",
-        password: "password123",
-        password_confirmation: "password123"
+        password: "Password123",
+        password_confirmation: "Password123"
       }
     }
 
@@ -74,8 +74,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       user: {
         name: "New User",
         email: "newuser@example.com",
-        password: "password123",
-        password_confirmation: "password123",
+        password: "Password123",
+        password_confirmation: "Password123",
         admin: true
       }
     }

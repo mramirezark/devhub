@@ -6,6 +6,9 @@ module Admin
   module Services
     class UserServiceTest < ActiveSupport::TestCase
       test "list returns all users ordered by created_at desc" do
+        # Clear existing users to ensure test isolation
+        User.delete_all
+
         user1 = create(:user, created_at: 2.days.ago)
         user2 = create(:user, created_at: 1.day.ago)
         user3 = create(:user, created_at: Time.current)
@@ -33,8 +36,8 @@ module Admin
         result = UserService.create(
           name: "New User",
           email: "newuser@example.com",
-          password: "password123",
-          password_confirmation: "password123",
+          password: "Password123",
+          password_confirmation: "Password123",
           admin: false
         )
 
@@ -49,8 +52,8 @@ module Admin
       test "create creates admin user when admin is true" do
         result = UserService.create(
           name: "Admin User",
-          email: "admin@example.com",
-          password: "password123",
+          email: "adminuser@example.com",
+          password: "Password123",
           admin: true
         )
 
@@ -62,7 +65,7 @@ module Admin
         result = UserService.create(
           name: "New User",
           email: "newuser@example.com",
-          password: "password123"
+          password: "Password123"
         )
 
         assert result[:success]

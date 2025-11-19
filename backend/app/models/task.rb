@@ -6,6 +6,9 @@ class Task < ApplicationRecord
 
   has_many :activities, as: :record, dependent: :destroy
 
+  # Allowed assignee types for polymorphic association
+  ALLOWED_ASSIGNEE_TYPES = %w[User].freeze
+
   enum status: {
     pending: 0,
     in_progress: 1,
@@ -17,27 +20,24 @@ class Task < ApplicationRecord
   validate :assignee_type_supported
 
   # Query scopes
-  scope :completed, -> { where(status: :completed) }
   scope :recent, -> { order(created_at: :desc) }
   scope :assigned_to, ->(user) { where(assignee_type: "User", assignee_id: user.id) }
 
-  after_commit :enqueue_status_tracking, on: %i[update]
+  after_update_commit :enqueue_status_tracking, if: :saved_change_to_status?
 
   private
 
   def enqueue_status_tracking
-    status_change = previous_changes["status"]
-    return if status_change.blank?
-
-    before_status, after_status = Array(status_change)
-    return if before_status == after_status
-
+    change = saved_change_to_status
+    before_status, after_status = change
     ActivityLoggerJob.perform_later(id, before_status, after_status)
   end
 
   def assignee_type_supported
     return if assignee_type.blank?
 
-    errors.add(:assignee_type, "must be User") unless assignee_type == "User"
+    unless ALLOWED_ASSIGNEE_TYPES.include?(assignee_type)
+      errors.add(:assignee_type, "must be one of: #{ALLOWED_ASSIGNEE_TYPES.join(', ')}")
+    end
   end
 end

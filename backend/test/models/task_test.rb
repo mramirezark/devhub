@@ -44,7 +44,7 @@ class TaskTest < ActiveSupport::TestCase
   test "should validate assignee_type is User" do
     task = build(:task, assignee_type: "InvalidType", assignee_id: 1)
     assert_not task.valid?
-    assert_includes task.errors[:assignee_type], "must be User"
+    assert_includes task.errors[:assignee_type].join(" "), "must be one of: User"
   end
 
   test "should allow nil assignee" do

@@ -12,8 +12,8 @@ class UserRegistrationServiceTest < ActiveSupport::TestCase
     attributes = {
       name: "New User",
       email: "newuser@example.com",
-      password: "password123",
-      password_confirmation: "password123"
+      password: "Password123",
+      password_confirmation: "Password123"
     }
 
     result = UserRegistrationService.call(attributes: attributes)
@@ -48,8 +48,8 @@ class UserRegistrationServiceTest < ActiveSupport::TestCase
     attributes = {
       name: "Another User",
       email: "existing@example.com",
-      password: "password123",
-      password_confirmation: "password123"
+      password: "Password123",
+      password_confirmation: "Password123"
     }
 
     result = UserRegistrationService.call(attributes: attributes)
@@ -64,8 +64,8 @@ class UserRegistrationServiceTest < ActiveSupport::TestCase
     attributes = {
       name: "New User",
       email: "newuser@example.com",
-      password: "password123",
-      password_confirmation: "password123",
+      password: "Password123",
+      password_confirmation: "Password123",
       admin: true,
       created_at: Time.current,
       id: 999
@@ -82,8 +82,8 @@ class UserRegistrationServiceTest < ActiveSupport::TestCase
     attributes = {
       name: "New User",
       email: "NEWUSER@EXAMPLE.COM",
-      password: "password123",
-      password_confirmation: "password123"
+      password: "Password123",
+      password_confirmation: "Password123"
     }
 
     result = UserRegistrationService.call(attributes: attributes)

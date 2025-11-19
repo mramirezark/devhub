@@ -8,6 +8,8 @@ class User < ApplicationRecord
 
   attr_accessor :password_confirmation
 
+  PASSWORD_REGEX = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
+
   has_many :assigned_tasks, class_name: "Task", as: :assignee, dependent: :nullify
 
   before_validation :normalize_email
@@ -46,11 +48,13 @@ class User < ApplicationRecord
   def password_complexity
     return if password.blank?
 
-    unless password.match?(/\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    unless password.match?(PASSWORD_REGEX)
       errors.add(:password, "must contain at least one uppercase letter, one lowercase letter, and one number")
     end
   end
 
+  # Syncs Authlogic's crypted_password to password_digest for compatibility
+  # This ensures password_digest is always in sync with crypted_password
   def sync_password_digest
     self.password_digest = crypted_password if crypted_password.present?
   end

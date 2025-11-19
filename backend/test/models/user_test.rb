@@ -74,13 +74,13 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "should authenticate with correct password" do
-    user = create(:user, password: "secure_password", password_confirmation: "secure_password")
-    assert user.valid_password?("secure_password")
+    user = create(:user, password: "SecurePass123", password_confirmation: "SecurePass123")
+    assert user.valid_password?("SecurePass123")
   end
 
   test "should not authenticate with incorrect password" do
-    user = create(:user, password: "secure_password", password_confirmation: "secure_password")
-    assert_not user.valid_password?("wrong_password")
+    user = create(:user, password: "SecurePass123", password_confirmation: "SecurePass123")
+    assert_not user.valid_password?("WrongPassword123")
   end
 
   test "should have admin flag" do

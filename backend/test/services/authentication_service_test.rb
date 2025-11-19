@@ -10,13 +10,13 @@ class AuthenticationServiceTest < ActiveSupport::TestCase
   setup :activate_authlogic
 
   setup do
-    @user = create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
+    @user = create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
   end
 
   test "login succeeds with correct credentials" do
     result = AuthenticationService.login(
       email: "test@example.com",
-      password: "password123"
+      password: "Password123"
     )
 
     assert result.user.persisted?
@@ -29,7 +29,7 @@ class AuthenticationServiceTest < ActiveSupport::TestCase
   test "login succeeds with remember_me option" do
     result = AuthenticationService.login(
       email: "test@example.com",
-      password: "password123",
+      password: "Password123",
       remember_me: true
     )
 
@@ -52,7 +52,7 @@ class AuthenticationServiceTest < ActiveSupport::TestCase
   test "login fails with non-existent email" do
     result = AuthenticationService.login(
       email: "nonexistent@example.com",
-      password: "password123"
+      password: "Password123"
     )
 
     assert_nil result.user
@@ -63,7 +63,7 @@ class AuthenticationServiceTest < ActiveSupport::TestCase
   test "login is case-insensitive for email" do
     result = AuthenticationService.login(
       email: "TEST@EXAMPLE.COM",
-      password: "password123"
+      password: "Password123"
     )
 
     assert result.user.persisted?

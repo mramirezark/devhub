@@ -9,14 +9,14 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
   setup :activate_authlogic
 
   setup do
-    @user = create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
+    @user = create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
   end
 
   test "POST /session creates a session with valid credentials" do
     session_params = {
       session: {
         email: "test@example.com",
-        password: "password123"
+        password: "Password123"
       }
     }
 
@@ -29,13 +29,16 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @user.id, json_response["user"]["id"]
     assert_equal @user.name, json_response["user"]["name"]
     assert_equal @user.email, json_response["user"]["email"]
+    # Verify JWT tokens are returned
+    assert_not_nil json_response["access_token"]
+    assert_not_nil json_response["refresh_token"]
   end
 
   test "POST /session creates a session with remember_me option" do
     session_params = {
       session: {
         email: "test@example.com",
-        password: "password123",
+        password: "Password123",
         remember_me: true
       }
     }
@@ -49,7 +52,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     session_params = {
       session: {
         email: "test@example.com",
-        password: "wrong_password"
+        password: "WrongPassword123"
       }
     }
 
@@ -64,7 +67,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     session_params = {
       session: {
         email: "nonexistent@example.com",
-        password: "password123"
+        password: "Password123"
       }
     }
 
@@ -79,7 +82,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     session_params = {
       session: {
         email: "TEST@EXAMPLE.COM",
-        password: "password123"
+        password: "Password123"
       }
     }
 
@@ -90,7 +93,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "DELETE /session destroys the current session" do
     # Create session by logging in first
-    post session_path, params: { session: { email: "test@example.com", password: "password123" } }, as: :json
+    post session_path, params: { session: { email: "test@example.com", password: "Password123" } }, as: :json
     assert_response :created
 
     delete session_path
@@ -98,9 +101,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :no_content
   end
 
-  test "DELETE /session returns unauthorized when no session exists" do
+  test "DELETE /session returns no_content when no session exists" do
+    # JWT tokens are stateless, so logout always succeeds (client-side token removal)
+    # Cookie-based sessions would require authentication, but we accept logout without auth
     delete session_path
 
-    assert_response :unauthorized
+    assert_response :no_content
   end
 end

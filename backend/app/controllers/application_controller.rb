@@ -6,7 +6,7 @@ class ApplicationController < ActionController::API
   # Make cookies accessible to Authlogic (needed for ActionController::API)
   public :cookies
 
-  # Stub methods that Authlogic expects (minimal set that worked before)
+  # Stub methods that Authlogic expects
   def renew_session_id
     true
   end

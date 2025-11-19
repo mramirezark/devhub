@@ -8,10 +8,10 @@ class UserSessionTest < ActiveSupport::TestCase
   setup :activate_authlogic
 
   test "should create session with valid credentials" do
-    user = create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
+    user = create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
     session = UserSession.new(
       email: "test@example.com",
-      password: "password123"
+      password: "Password123"
     )
     assert session.save
     assert_equal user, session.user
@@ -21,14 +21,14 @@ class UserSessionTest < ActiveSupport::TestCase
     create(:user, email: "test@example.com")
     session = UserSession.new(
       email: "wrong@example.com",
-      password: "password123"
+      password: "Password123"
     )
     assert_not session.save
     assert_nil session.user
   end
 
   test "should not create session with invalid password" do
-    create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
+    create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
     session = UserSession.new(
       email: "test@example.com",
       password: "wrong_password"
@@ -46,29 +46,29 @@ class UserSessionTest < ActiveSupport::TestCase
   end
 
   test "should find user by email" do
-    user = create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
-    session = UserSession.new(email: "test@example.com", password: "password123")
+    user = create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
+    session = UserSession.new(email: "test@example.com", password: "Password123")
     session.save
     assert_equal user.id, session.user.id
   end
 
   test "should be case insensitive for email" do
-    user = create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
-    session = UserSession.new(email: "TEST@EXAMPLE.COM", password: "password123")
+    user = create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
+    session = UserSession.new(email: "TEST@EXAMPLE.COM", password: "Password123")
     assert session.save
     assert_equal user.id, session.user.id
   end
 
   test "should persist session after creation" do
-    create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
-    session = UserSession.new(email: "test@example.com", password: "password123")
+    create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
+    session = UserSession.new(email: "test@example.com", password: "Password123")
     session.save
     assert session.persisted?
   end
 
   test "should destroy session" do
-    create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123")
-    session = UserSession.new(email: "test@example.com", password: "password123")
+    create(:user, email: "test@example.com", password: "Password123", password_confirmation: "Password123")
+    session = UserSession.new(email: "test@example.com", password: "Password123")
     session.save
     assert session.destroy
     assert_not session.persisted?
