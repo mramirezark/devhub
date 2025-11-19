@@ -8,6 +8,40 @@ import type {
 } from './types'
 import { API_BASE_URL, apiRequest } from '../../lib/http'
 
+const ACCESS_TOKEN_KEY = 'devhub_access_token'
+const REFRESH_TOKEN_KEY = 'devhub_refresh_token'
+
+// Export token getters for use in HTTP clients
+export const getStoredAccessToken = (): string | null => {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(ACCESS_TOKEN_KEY)
+}
+
+export const getStoredRefreshToken = (): string | null => {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(REFRESH_TOKEN_KEY)
+}
+
+const storeTokens = (accessToken: string | null, refreshToken: string | null): void => {
+  if (typeof window === 'undefined') return
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken)
+  } else {
+    localStorage.removeItem(ACCESS_TOKEN_KEY)
+  }
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
+  } else {
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+  }
+}
+
+const clearTokens = (): void => {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(ACCESS_TOKEN_KEY)
+  localStorage.removeItem(REFRESH_TOKEN_KEY)
+}
+
 const initialState: AuthState = {
   currentUser: null,
   loading: false,
@@ -21,11 +55,21 @@ export const initializeAuth = createAsyncThunk<
   { rejectValue: string }
 >('auth/initialize', async (_, { rejectWithValue }) => {
   try {
+    const token = getStoredAccessToken()
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
+    }
+
     const response = await fetch(`${API_BASE_URL}/profile`, {
       credentials: 'include',
+      headers,
     })
 
     if (response.status === 401) {
+      clearTokens()
       return null
     }
 
@@ -84,6 +128,10 @@ export const login = createAsyncThunk<
         },
       },
     })
+    // Store tokens if provided
+    if (response.access_token && response.refresh_token) {
+      storeTokens(response.access_token, response.refresh_token)
+    }
     return response.user
   } catch (error) {
     const message =
@@ -92,14 +140,57 @@ export const login = createAsyncThunk<
   }
 })
 
+export const refreshAccessToken = createAsyncThunk<
+  { access_token: string; refresh_token: string },
+  void,
+  { rejectValue: string }
+>('auth/refreshToken', async (_, { rejectWithValue }) => {
+  try {
+    const refreshToken = getStoredRefreshToken()
+    if (!refreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    const response = await apiRequest<{
+      access_token: string
+      refresh_token: string
+    }>('/session/refresh', {
+      method: 'POST',
+      json: { refresh_token: refreshToken },
+    })
+
+    storeTokens(response.access_token, response.refresh_token)
+    return response
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Unable to refresh token'
+    clearTokens()
+    return rejectWithValue(message)
+  }
+})
+
 export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await apiRequest('/session', { method: 'DELETE' })
+      const token = getStoredAccessToken()
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      await apiRequest('/session', { 
+        method: 'DELETE',
+        headers,
+      })
+      clearTokens()
     } catch (error) {
       const message =
         error instanceof Error ? error.message : 'Unable to log out right now'
+      // Clear tokens even if request fails
+      clearTokens()
       return rejectWithValue(message)
     }
   },
@@ -145,6 +236,8 @@ const authSlice = createSlice({
         state.loading = false
         state.status = 'authenticated'
         state.currentUser = action.payload
+        // Signup might also return a token in some cases
+        // For now, user needs to login after signup
       })
       .addCase(signup.rejected, (state, action) => {
         state.loading = false

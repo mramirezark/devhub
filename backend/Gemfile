@@ -40,6 +40,7 @@ gem "rack-cors"
 
 # Authentication
 gem "authlogic"
+gem "jwt"
 
 group :development, :test do
   gem "dotenv-rails"

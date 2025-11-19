@@ -1,3 +1,5 @@
+import { getStoredAccessToken } from '../features/auth/authSlice'
+
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000'
 
@@ -10,11 +12,20 @@ export async function apiRequest<T>(
   options: ApiRequestOptions = {},
 ): Promise<T> {
   const { json, headers, ...rest } = options
+  
+  // Automatically include access token if available
+  const token = getStoredAccessToken()
+  const defaultHeaders: HeadersInit = {
+    'Content-Type': 'application/json',
+  }
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`
+  }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      ...defaultHeaders,
       ...(headers ?? {}),
     },
     body: json ? JSON.stringify(json) : rest.body,

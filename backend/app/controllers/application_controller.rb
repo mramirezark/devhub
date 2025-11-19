@@ -72,7 +72,37 @@ class ApplicationController < ActionController::API
   end
 
   def current_user
-    @current_user ||= current_user_session&.record
+    @current_user ||= begin
+      # Try JWT token authentication first (from Authorization header)
+      token = extract_auth_token
+      if token
+        # Verify JWT access token (stateless, no DB lookup needed)
+        token_data = JwtService.verify_access_token(token)
+        if token_data
+          user = User.find_by(id: token_data[:user_id])
+          if user
+            Rails.logger.info "[JWT] User authenticated via token: #{user.id}"
+            return user
+          else
+            Rails.logger.warn "[JWT] User not found for token user_id: #{token_data[:user_id]}"
+          end
+        else
+          Rails.logger.warn "[JWT] Invalid or expired token"
+        end
+      end
+
+      # Fall back to cookie-based session authentication (Authlogic)
+      current_user_session&.record
+    end
+  end
+
+  def extract_auth_token
+    auth_header = request.headers["Authorization"]
+    return nil unless auth_header
+
+    # Support "Bearer <token>" or just "<token>"
+    match = auth_header.match(/\ABearer\s+(.+)\z/i)
+    match ? match[1] : auth_header.strip
   end
 
   def require_authenticated_user!

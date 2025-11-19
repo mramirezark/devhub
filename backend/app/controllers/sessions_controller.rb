@@ -9,25 +9,64 @@ class SessionsController < ApplicationController
     # Ensure Authlogic has controller context
     UserSession.controller = self
 
-    # Use the simple approach that worked before - let Authlogic handle it
+    # Use Authlogic to validate credentials
     @user_session = UserSession.new(session_params.to_h)
 
     if @user_session.save
-      render json: { user: user_payload(@user_session.user, include_admin: true) }, status: :created
+      user = @user_session.user
+
+      # Generate JWT tokens after successful Authlogic login
+      access_token = JwtService.encode_access_token(
+        user_id: user.id,
+        email: user.email
+      )
+      refresh_token = JwtService.encode_refresh_token(user_id: user.id)
+
+      render json: {
+        user: user_payload(user, include_admin: true),
+        access_token: access_token,
+        refresh_token: refresh_token
+      }, status: :created
     else
       render json: { errors: @user_session.errors.full_messages }, status: :unauthorized
     end
   end
 
+  def refresh
+    refresh_token = params[:refresh_token]
+    return render json: { error: "Refresh token required" }, status: :unauthorized unless refresh_token
+
+    token_data = JwtService.verify_refresh_token(refresh_token)
+    return render json: { error: "Invalid or expired refresh token" }, status: :unauthorized unless token_data
+
+    user = User.find_by(id: token_data[:user_id])
+    return render json: { error: "User not found" }, status: :unauthorized unless user
+
+    # Generate new access and refresh tokens
+    new_access_token = JwtService.encode_access_token(
+      user_id: user.id,
+      email: user.email
+    )
+    new_refresh_token = JwtService.encode_refresh_token(user_id: user.id)
+
+    render json: {
+      access_token: new_access_token,
+      refresh_token: new_refresh_token
+    }, status: :ok
+  end
+
   def destroy
+    # For JWT tokens, they are stateless so we just clear the session/cookie
+    # Client is responsible for discarding tokens (logout is handled client-side)
     if current_user_session
       current_user_session.destroy
       # Clear the cookie
       response.delete_cookie("_devhub_session", path: "/")
-      head :no_content
-    else
-      head :unauthorized
     end
+
+    # JWT tokens don't need server-side invalidation (stateless)
+    # If you need token revocation, implement a blacklist/whitelist
+    head :no_content
   end
 
   private

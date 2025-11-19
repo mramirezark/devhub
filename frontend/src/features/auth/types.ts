@@ -27,5 +27,7 @@ export interface LoginPayload {
 
 export interface AuthResponse {
   user: UserSummary
+  access_token?: string
+  refresh_token?: string
 }
 

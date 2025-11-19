@@ -9,7 +9,9 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   resources :users, only: [ :create ]
-  resource :session, only: [ :create, :destroy ]
+  resource :session, only: [ :create, :destroy ] do
+    post :refresh, on: :collection
+  end
   get "/profile", to: "profiles#show"
 
   # Mount Admin engine at /admin
